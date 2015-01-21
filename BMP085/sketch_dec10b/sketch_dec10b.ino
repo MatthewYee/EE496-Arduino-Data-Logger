@@ -15,6 +15,7 @@ void setup(void)
   Serial.print("Initializing SD card...");
   pinMode(10,OUTPUT);
   if (!SD.begin(chipSelect)) {
+     Serial.println(" ");
      Serial.println("Card has failed, or isn't present!");
      return;
   }
@@ -37,8 +38,15 @@ void loop(void)
   sensors_event_t event;
   bmp.getEvent(&event);
   
+  /* Variables */
+  float temperature;
+  
   // make a string for assembling data to log
   String dataString = "";
+  String dataString2 = "";
+  
+  /* Get Curren Temperature */
+  bmp.getTemperature(&temperature);
  
   /* Display the results (barometric pressure is measure in hPa) */
   if (event.pressure)
@@ -47,6 +55,7 @@ void loop(void)
     /*Serial.print("Pressure: "); Serial.print(event.pressure); Serial.println(" hPa");*/
     Serial.println("Printing stuff into dataString");
     dataString += event.pressure;
+    dataString2 += temperature;
   }
   else
   {
@@ -55,6 +64,7 @@ void loop(void)
   delay(250);
   
   File dataFile = SD.open("log.txt", FILE_WRITE);
+  File dataFile2 = SD.open("log2.txt", FILE_WRITE);
   
   if (dataFile) {
     dataFile.println(dataString);
@@ -62,6 +72,15 @@ void loop(void)
     Serial.println(dataString);
   }
   else {
-    Serial.println("error opening log");
+    Serial.println("error opening log 1");
+  }
+  
+  if (dataFile2) {
+    dataFile2.println(dataString2);
+    dataFile2.close();
+    Serial.println(dataString2);
+  }
+  else {
+    Serial.println("error opening log 2");
   }
 }
